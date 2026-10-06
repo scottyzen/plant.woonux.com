@@ -3,10 +3,7 @@ fragment ExternalProduct on ExternalProduct {
   buttonText
   ...ProductPricing
   image {
-    sourceUrl
-    altText
-    title
-    databaseId
+    ...Image
     cartSourceUrl: sourceUrl(size: THUMBNAIL)
     productCardSourceUrl: sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
   }

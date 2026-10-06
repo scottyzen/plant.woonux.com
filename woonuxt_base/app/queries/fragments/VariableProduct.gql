@@ -17,10 +17,7 @@ fragment VariableProduct on VariableProduct {
   width
   height
   image {
-    sourceUrl
-    altText
-    title
-    databaseId
+    ...Image
     cartSourceUrl: sourceUrl(size: THUMBNAIL)
     productCardSourceUrl: sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
   }

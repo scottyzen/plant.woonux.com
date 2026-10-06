@@ -14,7 +14,7 @@ const parseJwtExpiry = (token?: string | null): number => {
   try {
     const [, payload] = token.split('.');
     if (!payload) return 0;
-    const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const normalized = payload.replaceAll('-', '+').replaceAll('_', '/');
     const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=');
     const decoded = import.meta.client ? JSON.parse(window.atob(padded)) : JSON.parse(Buffer.from(padded, 'base64').toString('utf-8'));
     return typeof decoded?.exp === 'number' ? decoded.exp : 0;
@@ -52,7 +52,7 @@ export const useAuthTokens = () => {
     legacyGqlToken.value = null;
     // Re-enter the Nuxt context in case this runs after an `await` (e.g. inside refreshAuthToken's
     // async continuation), where the ambient Nuxt instance may otherwise be lost. See NUXT_E1001.
-    nuxtApp.runWithContext(() => {
+    void nuxtApp.runWithContext(() => {
       useGqlToken({ token, config: { name: 'Authorization', type: 'Bearer' } });
       if (!token) useGqlHeaders({ Authorization: '' });
     });
@@ -165,11 +165,7 @@ export const useAuthTokens = () => {
     return refreshed ? authToken.value : liveToken();
   };
 
-  if (authToken.value) {
-    const token = liveToken();
-    if (token) setActiveAuthToken(token);
-    else clearActiveAuthToken();
-  } else if (authTokenCookie.value) {
+  if (authToken.value || authTokenCookie.value) {
     const token = liveToken();
     if (token) setActiveAuthToken(token);
     else clearActiveAuthToken();

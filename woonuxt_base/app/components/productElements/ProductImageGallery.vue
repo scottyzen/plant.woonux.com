@@ -7,6 +7,8 @@ const { storeSettings } = useAppConfig();
 type Gallery = { nodes: ImageFragment[] };
 type ThumbnailPosition = 'bottom' | 'left';
 
+const imgWidth = 640;
+
 const props = defineProps({
   mainImage: { type: Object as PropType<ImageFragment>, required: true },
   gallery: { type: Object as PropType<Gallery>, required: true },
@@ -19,9 +21,18 @@ const primaryImage = computed<ImageFragment>(() => ({
   title: props.mainImage.title,
   altText: props.mainImage.altText,
   databaseId: props.mainImage.databaseId,
+  mediaDetails: props.mainImage.mediaDetails,
 }));
 
 const imageToShow = ref<ImageFragment>(primaryImage.value);
+
+const imageDimensions = computed(() => {
+  const width = imageToShow.value.mediaDetails?.width;
+  const height = imageToShow.value.mediaDetails?.height;
+  if (!width || !height || width <= 0 || height <= 0) return { width: imgWidth, height: imgWidth, aspectRatio: '1 / 1' };
+
+  return { width: imgWidth, height: Math.round((imgWidth * height) / width), aspectRatio: `${width} / ${height}` };
+});
 
 const galleryImages = computed<ImageFragment[]>(() => {
   // Add the primary image to the start of the gallery and remove duplicates
@@ -57,8 +68,6 @@ watch(
   },
 );
 
-const imgWidth = 640;
-
 const thumbnailPosition = computed<ThumbnailPosition>(() => (storeSettings.productGalleryThumbnailsPosition === 'left' ? 'left' : 'bottom'));
 const showLeftThumbnails = computed(() => thumbnailPosition.value === 'left');
 
@@ -82,11 +91,11 @@ const thumbnailButtonClasses = (galleryImg: ImageFragment) => [
 
 <template>
   <div :class="galleryRootClasses">
-    <div class="relative group aspect-square w-full min-w-0 overflow-hidden rounded-xl bg-gray-100">
+    <div class="relative group w-full min-w-0 overflow-hidden rounded-xl bg-gray-100" :style="{ aspectRatio: imageDimensions.aspectRatio }">
       <SaleBadge :node class="absolute text-base top-4 right-4" />
       <NuxtPicture
-        :width="imgWidth"
-        :height="imgWidth"
+        :width="imageDimensions.width"
+        :height="imageDimensions.height"
         sizes="412px:100vw sm:100vw md:50vw lg:50vw xl:640px"
         :alt="imageToShow.altText || node.name"
         :title="imageToShow.title || node.name"
@@ -128,7 +137,7 @@ const thumbnailButtonClasses = (galleryImg: ImageFragment) => [
           :src="galleryImg.sourceUrl || FALLBACK_IMG"
           :alt="galleryImg.altText || node.name"
           loading="lazy"
-          :img-attrs="{ class: 'h-full w-full object-contain' }" />
+          :img-attrs="{ class: 'h-full w-full object-cover' }" />
       </button>
     </div>
   </div>
