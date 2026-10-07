@@ -19,7 +19,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "update:woonuxt": "bash scripts/update-woonuxt.sh"
   },
   "dependencies": {
     "@stripe/stripe-js": "^9.17.0",
