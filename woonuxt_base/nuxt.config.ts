@@ -139,6 +139,7 @@ export default defineNuxtConfig({
     // are served from Netlify instead of reaching the WordPress API at runtime.
     '/blog': { prerender: true },
     '/blog/**': { prerender: true },
+    '/categories': { prerender: true },
     // Disable prerendering for dynamic checkout/order pages
     '/checkout/order-received/**': { prerender: false },
     '/order-summary/**': { prerender: false },
