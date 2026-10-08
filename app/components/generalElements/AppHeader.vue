@@ -1,10 +1,11 @@
 <script setup lang="ts">
 const { isShowingSearch } = useSearching();
+const { viewer } = useAuth();
 </script>
 
 <template>
   <header class="sticky top-0 z-40 border-b border-[#e3eadc] bg-white">
-    <div class="hidden bg-[#0d5134] text-xs text-white lg:block">
+    <div v-if="!viewer" class="hidden bg-[#0d5134] text-xs text-white lg:block">
       <div class="container grid grid-cols-[1fr_auto_1fr] items-center py-2.5">
         <span class="text-white/85">Call us: +123-456-789</span>
         <span
