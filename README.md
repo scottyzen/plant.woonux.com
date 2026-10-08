@@ -40,6 +40,8 @@ npm install
 npm run dev
 ```
 
+`npm run dev` binds to localhost only. Use `npm run dev:host` to expose the dev server on your network (for example to test on a phone); Nuxt warns in that mode because the dev server has no authentication.
+
 `woonuxt_base/` is the parent Nuxt layer that provides WooNuxt's storefront; it is not a separately runnable package. Add custom pages, components, and configuration in the root project as a child layer.
 
 ## Deployment
@@ -274,7 +276,7 @@ This keeps the existing `.gql` files, generated operation types, and imperative 
 
 Code generation loads the root `.env` file before Nuxt starts; exported deployment variables take precedence. `GQL_HOST` is required for code generation.
 
-The SDK is regenerated automatically before `dev`, `dev:ssl`, `build`, `generate`, and `typecheck`, using the configured `GQL_HOST`. The generated `woonuxt_base/app/gql/default.ts` is ignored because it reflects each storefront's backend. Run `npm run graphql:codegen` directly when editing `.gql` files and you want immediate type updates without restarting Nuxt. Installation intentionally does not run codegen, so dependency installation stays independent of backend availability.
+The SDK is regenerated automatically before `dev`, `dev:ssl`, `build`, `generate`, and `typecheck`, using the configured `GQL_HOST`. Put custom operations and fragments in `app/queries/` (including subfolders); Codegen automatically finds every `app/queries/**/*.gql` file in the project and its Nuxt layers, so you never need to edit `codegen.ts` when adding a query. The generated `woonuxt_base/app/gql/default.ts` is ignored because it reflects each storefront's backend. Run `npm run graphql:codegen` directly when editing `.gql` files and you want immediate type updates without restarting Nuxt. Installation intentionally does not run codegen, so dependency installation stays independent of backend availability.
 
 &nbsp;
 
