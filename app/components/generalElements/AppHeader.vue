@@ -13,6 +13,7 @@ const { viewer } = useAuth();
           >Sign up and get <b class="text-[#f6c51e]">25% off</b> your first plant order.
           <NuxtLink to="/my-account" class="ml-2 font-bold text-[#f6c51e] underline underline-offset-2">Sign up now</NuxtLink></span
         >
+        <span v-else aria-hidden="true" />
         <div class="flex justify-end gap-3 text-[#f6c51e]">
           <Icon name="ion:logo-facebook" /><Icon name="ion:logo-instagram" /><Icon name="ion:logo-pinterest" /><Icon name="ion:logo-youtube" />
         </div>
