@@ -33,7 +33,10 @@ useSeoMeta({
       <div v-if="isLoading" class="flex min-h-64 items-center justify-center"><LoadingIcon size="32" stroke="3" /></div>
 
       <div v-else-if="posts.length" class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,21rem),1fr))] gap-5 lg:gap-7">
-        <article v-for="post in posts" :key="post.id" class="group overflow-hidden rounded-3xl border border-[#e3eadc] bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg hover:shadow-[#244423]/10">
+        <article
+          v-for="post in posts"
+          :key="post.id"
+          class="group overflow-hidden rounded-3xl border border-[#e3eadc] bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg hover:shadow-[#244423]/10">
           <NuxtLink :to="`/blog/${post.slug}`" external class="block">
             <div class="aspect-[16/9] bg-[#edf4e7]">
               <NuxtImg
@@ -48,9 +51,16 @@ useSeoMeta({
           </NuxtLink>
           <div class="flex min-h-60 flex-col p-6 sm:p-7">
             <p v-if="post.date" class="text-xs font-bold uppercase tracking-[.14em] text-[#588354]">{{ formatDate(post.date) }}</p>
-            <h2 class="mt-3 text-2xl leading-tight tracking-[-.035em]"><NuxtLink :to="`/blog/${post.slug}`" external class="hover:text-[#3d7b3d]">{{ post.title }}</NuxtLink></h2>
-            <div v-if="post.excerpt" class="prose prose-sm mt-4 max-w-none text-[#546356]" v-html="post.excerpt" />
-            <NuxtLink :to="`/blog/${post.slug}`" external class="mt-auto inline-flex items-center gap-2 pt-5 text-sm font-bold text-[#286134] hover:text-[#d49f00]">Read article <span aria-hidden="true">→</span></NuxtLink>
+            <h2 class="mt-3 text-2xl leading-tight tracking-[-.035em]">
+              <NuxtLink :to="`/blog/${post.slug}`" external class="hover:text-[#3d7b3d]">{{ post.title }}</NuxtLink>
+            </h2>
+            <div v-if="post.excerpt" class="prose prose-sm mt-4 max-w-none text-[#546356]" v-html="post.excerpt"></div>
+            <NuxtLink
+              :to="`/blog/${post.slug}`"
+              external
+              class="mt-auto inline-flex items-center gap-2 pt-5 text-sm font-bold text-[#286134] hover:text-[#d49f00]"
+              >Read article <span aria-hidden="true">→</span></NuxtLink
+            >
           </div>
         </article>
       </div>
