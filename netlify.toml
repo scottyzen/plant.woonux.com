@@ -3,9 +3,6 @@
   NUXT_IMAGE_DOMAINS = "Comma separated list of domains. example.com,example2.com"
 
 [build.environment]
-  GQL_HOST = "https://plantsstore.wpenginepowered.com/graphql"
-  NUXT_IMAGE_DOMAINS = "plantsstore.wpenginepowered.com"
-  APP_HOST = "https://plant.woonuxt.com"
   NUXT_IMAGE_PROVIDER = "netlify"
   NITRO_PRESET = "static"
 
