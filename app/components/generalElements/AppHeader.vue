@@ -5,10 +5,11 @@ const { viewer } = useAuth();
 
 <template>
   <header class="sticky top-0 z-40 border-b border-[#e3eadc] bg-white">
-    <div v-if="!viewer" class="hidden bg-[#0d5134] text-xs text-white lg:block">
+    <div class="hidden bg-[#0d5134] text-xs text-white lg:block">
       <div class="container grid grid-cols-[1fr_auto_1fr] items-center py-2.5">
         <span class="text-white/85">Call us: +123-456-789</span>
         <span
+          v-if="!viewer"
           >Sign up and get <b class="text-[#f6c51e]">25% off</b> your first plant order.
           <NuxtLink to="/my-account" class="ml-2 font-bold text-[#f6c51e] underline underline-offset-2">Sign up now</NuxtLink></span
         >
