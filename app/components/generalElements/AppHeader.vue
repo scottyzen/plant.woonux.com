@@ -26,7 +26,7 @@ const { viewer } = useAuth();
         <NuxtLink to="/products" class="hover:text-[#d49f00]">Plants</NuxtLink>
         <NuxtLink to="/categories" class="hover:text-[#d49f00]">Pots & Accessories</NuxtLink>
         <NuxtLink to="/about" class="hover:text-[#d49f00]">About</NuxtLink>
-        <NuxtLink to="/blog" external class="hover:text-[#d49f00]">Blog</NuxtLink>
+        <a href="/blog" class="hover:text-[#d49f00]">Blog</a>
       </nav>
       <div class="flex items-center gap-4 text-[#183724]">
         <ProductSearch class="hidden w-52 xl:flex" />

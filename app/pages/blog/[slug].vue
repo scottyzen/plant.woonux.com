@@ -29,7 +29,7 @@ useSeoMeta({
     <article v-if="post">
       <header class="border-b border-[#e3eadc] bg-[#f2f7ec]">
         <div class="container max-w-4xl py-9 sm:py-12 lg:py-14">
-          <NuxtLink to="/blog" external class="inline-flex items-center gap-2 text-sm font-bold text-[#286134] hover:text-[#d49f00]"><span aria-hidden="true">←</span> Back to journal</NuxtLink>
+          <a href="/blog" class="inline-flex items-center gap-2 text-sm font-bold text-[#286134] hover:text-[#d49f00]"><span aria-hidden="true">←</span> Back to journal</a>
           <p v-if="post.date" class="mt-7 text-xs font-bold uppercase tracking-[.16em] text-[#588354]">{{ formatDate(post.date) }}</p>
           <h1 class="mt-3 text-4xl leading-[1.04] tracking-[-.055em] sm:text-6xl">{{ post.title }}</h1>
         </div>
@@ -46,7 +46,7 @@ useSeoMeta({
 
     <div v-else class="container py-16 text-center sm:py-20">
       <h1 class="text-3xl">We couldn't load this article.</h1>
-      <NuxtLink to="/blog" external class="mt-5 inline-flex text-sm font-bold text-[#286134] hover:text-[#d49f00]">Back to journal</NuxtLink>
+      <a href="/blog" class="mt-5 inline-flex text-sm font-bold text-[#286134] hover:text-[#d49f00]">Back to journal</a>
     </div>
   </main>
 </template>
