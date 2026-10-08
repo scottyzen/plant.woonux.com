@@ -4,7 +4,11 @@ import type { GetPostsQuery } from '#gql/default';
 type PostPreview = NonNullable<NonNullable<GetPostsQuery['posts']>['nodes'][number]>;
 
 const { siteName, siteImage } = useAppConfig();
-const { data, error, status } = await useAsyncGql('getPosts');
+// Journal entries are included in the prerendered route payload. Avoid a client-side
+// GraphQL fallback when navigating between static pages.
+const { data, error, status } = await useAsyncGql('getPosts', undefined, {
+  asyncDataOptions: { immediate: import.meta.server },
+});
 const posts = computed<PostPreview[]>(() => data.value?.posts?.nodes ?? []);
 const isLoading = computed(() => status.value === 'idle' || status.value === 'pending');
 

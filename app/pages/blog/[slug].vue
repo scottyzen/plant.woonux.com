@@ -6,7 +6,11 @@ type BlogPost = NonNullable<GetPostQuery['post']>;
 const route = useRoute();
 const { siteName, siteImage } = useAppConfig();
 const slug = computed(() => String(route.params.slug));
-const { data, error } = await useAsyncGql('getPost', { slug: slug.value });
+// Article data is generated at build time and delivered in this route's payload.
+// Keeping this server-only prevents client navigation from querying WordPress.
+const { data, error } = await useAsyncGql('getPost', { slug: slug.value }, {
+  asyncDataOptions: { immediate: import.meta.server },
+});
 const post = computed<BlogPost | null>(() => data.value?.post ?? null);
 
 if (!post.value && !error.value) {
