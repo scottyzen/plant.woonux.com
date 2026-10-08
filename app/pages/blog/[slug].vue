@@ -6,11 +6,7 @@ type BlogPost = NonNullable<GetPostQuery['post']>;
 const route = useRoute();
 const { siteName, siteImage } = useAppConfig();
 const slug = computed(() => String(route.params.slug));
-// Article data is generated at build time and delivered in this route's payload.
-// Keeping this server-only prevents client navigation from querying WordPress.
-const { data, error } = await useAsyncGql('getPost', { slug: slug.value }, {
-  asyncDataOptions: { immediate: import.meta.server },
-});
+const { data, error } = await useAsyncGql('getPost', { slug: slug.value });
 const post = computed<BlogPost | null>(() => data.value?.post ?? null);
 
 if (!post.value && !error.value) {
@@ -33,7 +29,7 @@ useSeoMeta({
     <article v-if="post">
       <header class="border-b border-[#e3eadc] bg-[#f2f7ec]">
         <div class="container max-w-4xl py-9 sm:py-12 lg:py-14">
-          <NuxtLink to="/blog" class="inline-flex items-center gap-2 text-sm font-bold text-[#286134] hover:text-[#d49f00]"><span aria-hidden="true">←</span> Back to journal</NuxtLink>
+          <NuxtLink to="/blog" external class="inline-flex items-center gap-2 text-sm font-bold text-[#286134] hover:text-[#d49f00]"><span aria-hidden="true">←</span> Back to journal</NuxtLink>
           <p v-if="post.date" class="mt-7 text-xs font-bold uppercase tracking-[.16em] text-[#588354]">{{ formatDate(post.date) }}</p>
           <h1 class="mt-3 text-4xl leading-[1.04] tracking-[-.055em] sm:text-6xl">{{ post.title }}</h1>
         </div>
@@ -50,7 +46,7 @@ useSeoMeta({
 
     <div v-else class="container py-16 text-center sm:py-20">
       <h1 class="text-3xl">We couldn't load this article.</h1>
-      <NuxtLink to="/blog" class="mt-5 inline-flex text-sm font-bold text-[#286134] hover:text-[#d49f00]">Back to journal</NuxtLink>
+      <NuxtLink to="/blog" external class="mt-5 inline-flex text-sm font-bold text-[#286134] hover:text-[#d49f00]">Back to journal</NuxtLink>
     </div>
   </main>
 </template>

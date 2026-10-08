@@ -4,11 +4,7 @@ import type { GetPostsQuery } from '#gql/default';
 type PostPreview = NonNullable<NonNullable<GetPostsQuery['posts']>['nodes'][number]>;
 
 const { siteName, siteImage } = useAppConfig();
-// Journal entries are included in the prerendered route payload. Avoid a client-side
-// GraphQL fallback when navigating between static pages.
-const { data, error, status } = await useAsyncGql('getPosts', undefined, {
-  asyncDataOptions: { immediate: import.meta.server },
-});
+const { data, error, status } = await useAsyncGql('getPosts');
 const posts = computed<PostPreview[]>(() => data.value?.posts?.nodes ?? []);
 const isLoading = computed(() => status.value === 'idle' || status.value === 'pending');
 
@@ -38,7 +34,7 @@ useSeoMeta({
 
       <div v-else-if="posts.length" class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,21rem),1fr))] gap-5 lg:gap-7">
         <article v-for="post in posts" :key="post.id" class="group overflow-hidden rounded-3xl border border-[#e3eadc] bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg hover:shadow-[#244423]/10">
-          <NuxtLink :to="`/blog/${post.slug}`" class="block">
+          <NuxtLink :to="`/blog/${post.slug}`" external class="block">
             <div class="aspect-[16/9] bg-[#edf4e7]">
               <NuxtImg
                 v-if="post.featuredImage?.node?.sourceUrl"
@@ -52,9 +48,9 @@ useSeoMeta({
           </NuxtLink>
           <div class="flex min-h-60 flex-col p-6 sm:p-7">
             <p v-if="post.date" class="text-xs font-bold uppercase tracking-[.14em] text-[#588354]">{{ formatDate(post.date) }}</p>
-            <h2 class="mt-3 text-2xl leading-tight tracking-[-.035em]"><NuxtLink :to="`/blog/${post.slug}`" class="hover:text-[#3d7b3d]">{{ post.title }}</NuxtLink></h2>
+            <h2 class="mt-3 text-2xl leading-tight tracking-[-.035em]"><NuxtLink :to="`/blog/${post.slug}`" external class="hover:text-[#3d7b3d]">{{ post.title }}</NuxtLink></h2>
             <div v-if="post.excerpt" class="prose prose-sm mt-4 max-w-none text-[#546356]" v-html="post.excerpt" />
-            <NuxtLink :to="`/blog/${post.slug}`" class="mt-auto inline-flex items-center gap-2 pt-5 text-sm font-bold text-[#286134] hover:text-[#d49f00]">Read article <span aria-hidden="true">→</span></NuxtLink>
+            <NuxtLink :to="`/blog/${post.slug}`" external class="mt-auto inline-flex items-center gap-2 pt-5 text-sm font-bold text-[#286134] hover:text-[#d49f00]">Read article <span aria-hidden="true">→</span></NuxtLink>
           </div>
         </article>
       </div>
