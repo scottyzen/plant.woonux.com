@@ -1,0 +1,17 @@
+query getPosts($first: Int = 12) {
+  posts(first: $first, where: { orderby: [{ field: DATE, order: DESC }] }) {
+    nodes {
+      id
+      title
+      slug
+      date
+      excerpt
+      featuredImage {
+        node {
+          altText
+          sourceUrl
+        }
+      }
+    }
+  }
+}
