@@ -7,8 +7,6 @@ const { storeSettings } = useAppConfig();
 type Gallery = { nodes: ImageFragment[] };
 type ThumbnailPosition = 'bottom' | 'left';
 
-const imgWidth = 640;
-
 const props = defineProps({
   mainImage: { type: Object as PropType<ImageFragment>, required: true },
   gallery: { type: Object as PropType<Gallery>, required: true },
@@ -25,14 +23,6 @@ const primaryImage = computed<ImageFragment>(() => ({
 }));
 
 const imageToShow = ref<ImageFragment>(primaryImage.value);
-
-const imageDimensions = computed(() => {
-  const width = imageToShow.value.mediaDetails?.width;
-  const height = imageToShow.value.mediaDetails?.height;
-  if (!width || !height || width <= 0 || height <= 0) return { width: imgWidth, height: imgWidth, aspectRatio: '1 / 1' };
-
-  return { width: imgWidth, height: Math.round((imgWidth * height) / width), aspectRatio: `${width} / ${height}` };
-});
 
 const galleryImages = computed<ImageFragment[]>(() => {
   // Add the primary image to the start of the gallery and remove duplicates
@@ -68,6 +58,17 @@ watch(
   },
 );
 
+const imgWidth = 640;
+
+const imageAspectRatio = computed(() => {
+  const { width, height } = imageToShow.value.mediaDetails || {};
+  if (!width || !height || !Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) return 1;
+  return width / height;
+});
+
+const imageHeight = computed(() => Math.round(imgWidth / imageAspectRatio.value));
+const galleryImageStyle = computed(() => ({ aspectRatio: `${imageAspectRatio.value}` }));
+
 const thumbnailPosition = computed<ThumbnailPosition>(() => (storeSettings.productGalleryThumbnailsPosition === 'left' ? 'left' : 'bottom'));
 const showLeftThumbnails = computed(() => thumbnailPosition.value === 'left');
 
@@ -91,11 +92,13 @@ const thumbnailButtonClasses = (galleryImg: ImageFragment) => [
 
 <template>
   <div :class="galleryRootClasses">
-    <div class="relative group w-full min-w-0 overflow-hidden rounded-xl bg-gray-100" :style="{ aspectRatio: imageDimensions.aspectRatio }">
+    <div
+      class="relative group w-full min-w-0 overflow-hidden rounded-xl bg-gray-100 transition-[aspect-ratio] duration-[250ms] ease-out"
+      :style="galleryImageStyle">
       <SaleBadge :node class="absolute text-base top-4 right-4" />
       <NuxtPicture
-        :width="imageDimensions.width"
-        :height="imageDimensions.height"
+        :width="imgWidth"
+        :height="imageHeight"
         sizes="412px:100vw sm:100vw md:50vw lg:50vw xl:640px"
         :alt="imageToShow.altText || node.name"
         :title="imageToShow.title || node.name"

@@ -136,6 +136,14 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
+    '/**': {
+      headers: {
+        'X-Content-Type-Options': 'nosniff',
+        'X-Frame-Options': 'SAMEORIGIN',
+        'Referrer-Policy': 'strict-origin-when-cross-origin',
+        'Permissions-Policy': 'camera=(), geolocation=(), microphone=()',
+      },
+    },
     // Serve the LCP-critical homepage from the CDN instead of fetching catalog data per request.
     '/': { prerender: true },
     // The journal is a fully static section. Its list and generated article routes

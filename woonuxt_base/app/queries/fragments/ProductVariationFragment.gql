@@ -10,7 +10,14 @@ fragment ProductVariation on ProductVariation {
   stockStatus
   hasAttributes
   image {
-    ...Image
+    sourceUrl
+    altText
+    title
+    databaseId
+    mediaDetails {
+      width
+      height
+    }
     cartSourceUrl: sourceUrl(size: THUMBNAIL)
     productCardSourceUrl: sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
   }

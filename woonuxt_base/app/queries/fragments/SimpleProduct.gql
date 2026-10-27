@@ -20,7 +20,14 @@ fragment SimpleProduct on SimpleProduct {
   reviewCount
   virtual
   image {
-    ...Image
+    sourceUrl
+    altText
+    title
+    databaseId
+    mediaDetails {
+      width
+      height
+    }
     cartSourceUrl: sourceUrl(size: THUMBNAIL)
     productCardSourceUrl: sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
   }
