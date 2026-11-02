@@ -4,7 +4,7 @@ import type { ExternalProduct, ProductDetail, Variation, VariationAttribute } fr
 
 const route = useRoute();
 const { storeSettings } = useAppConfig();
-const { addToCart, isUpdatingCart, isAddingToCart, isOptimisticCartMode } = useCart();
+const { addToCart, cartError, isUpdatingCart, isAddingToCart, isOptimisticCartMode } = useCart();
 const { frontEndUrl, getErrorMessage } = useHelpers();
 const { t } = useI18n();
 const gql = useWooGraphQL();
@@ -358,6 +358,7 @@ const addToCartLoading = computed(() => (isOptimisticCartMode.value ? false : is
                 {{ $t('shop.addToCart') }}
               </Button>
             </div>
+            <p v-if="cartError" role="alert" class="mt-3 text-sm text-red-600">{{ cartError }}</p>
             <a
               v-if="externalProduct?.externalUrl"
               :href="externalProduct.externalUrl"

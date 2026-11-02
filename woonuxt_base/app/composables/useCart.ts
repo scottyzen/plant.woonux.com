@@ -25,6 +25,7 @@ export function useCart() {
   const optimisticPendingMutations = useState<number>('optimisticPendingMutations', () => 0);
   const optimisticServerCart = useState<Cart | null>('optimisticServerCart', () => null);
   const optimisticHadError = useState<boolean>('optimisticHadError', () => false);
+  const cartError = useState<string | null>('cartError', () => null);
   const cartItemCount = useState<number>('cartItemCount', () => 0);
   const paymentGateways = useState<PaymentGateways | null>('paymentGateways', () => null);
   const { getDomain, getErrorContext, getErrorMessage, getSessionCookieOptions } = useHelpers();
@@ -179,6 +180,16 @@ export function useCart() {
     }
   };
 
+  // WooCommerce error messages can contain HTML (e.g. a "View cart" link).
+  const toPlainText = (message?: string): string =>
+    (message ?? 'Could not update the cart.')
+      .replace(/<[^>]*>/g, '')
+      .replace(/&mdash;/g, '—')
+      .replace(/&amp;/g, '&')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/\s*View cart$/, '');
+
   const enqueueCartMutation = (fn: () => Promise<Cart | null>, optimistic: boolean): Promise<void> => {
     const run = cartMutationQueue
       .catch(() => {})
@@ -193,6 +204,7 @@ export function useCart() {
         } catch (error: unknown) {
           const errorMsg = getErrorMessage(error);
           console.error('Error updating cart:', errorMsg);
+          cartError.value = toPlainText(errorMsg);
           if (optimistic) optimisticHadError.value = true;
           throw error;
         }
@@ -406,6 +418,7 @@ export function useCart() {
 
   // add an item to the cart
   async function addToCart(input: AddToCartInput, optimistic?: OptimisticAddPayload): Promise<void> {
+    cartError.value = null;
     isAddingToCart.value = true;
     const quantity = normalizeQuantity(input.quantity);
     // cartMode controls whether we update UI immediately or wait for server confirmation.
@@ -595,6 +608,7 @@ export function useCart() {
     isUpdatingCart,
     isCartMutating,
     isAddingToCart,
+    cartError,
     isUpdatingCoupon,
     optimisticPendingMutations,
     cartItemCount,
