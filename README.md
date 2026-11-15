@@ -31,6 +31,14 @@ See the [WooNuxt store setup hurdles](./docs/woonuxt-store-setup-hurdles.md) log
 
 [![button](https://user-images.githubusercontent.com/5116925/218880214-a16287a7-fd8c-4299-9e65-0871136f0771.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/scottyzen/woonuxt) [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fscottyzen%2Fwoonuxt&repository-name=WooNuxt&env=GQL_HOST,NUXT_IMAGE_DOMAINS)
 
+### Deploy on Deplo
+
+Copy WooNuxt into your Git account and deploy the storefront on your own [Deplo](https://deplo.build) instance:
+
+[![Deploy on Deplo](https://deplo.build/button.svg)](https://deplo.build/deploy?repo=https://github.com/scottyzen/woonuxt)
+
+Requires Deplo 0.8.2 or later. Complete the WordPress setup above and set `GQL_HOST` and `NUXT_IMAGE_DOMAINS` in Deplo before deploying. See [`.env.example`](./.env.example) for the storefront settings and the [deploy button guide](https://deplo.build/docs/guides/deploy/deploy-button) for the button flow.
+
 ### Local development
 
 Run all project commands from the repository root. Create `.env` from `.env.example`, set `GQL_HOST` and `NUXT_IMAGE_DOMAINS`, then run:
@@ -43,6 +51,30 @@ npm run dev
 `npm run dev` binds to localhost only. Use `npm run dev:host` to expose the dev server on your network (for example to test on a phone); Nuxt warns in that mode because the dev server has no authentication.
 
 `woonuxt_base/` is the parent Nuxt layer that provides WooNuxt's storefront; it is not a separately runnable package. Add custom pages, components, and configuration in the root project as a child layer.
+
+## Updating a fork
+
+Keep store-specific customizations in the root child layer, not in
+`woonuxt_base/`. For example, copy a base component into the equivalent path
+under `app/` before changing it. This keeps your overrides separate from
+WooNuxt updates.
+
+Configure the official WooNuxt repository once in your local fork:
+
+```bash
+git remote add upstream https://github.com/scottyzen/woonuxt.git
+```
+
+To update to a released WooNuxt version, commit or stash your work, then:
+
+```bash
+git fetch upstream --tags
+git merge <release-tag>
+npm install
+git push origin master
+```
+
+Replace `<release-tag>` with a version from the [WooNuxt releases](https://github.com/scottyzen/woonuxt/releases), such as `4.31.1`. `git fetch` only downloads releases; `git merge` applies the selected release to your fork. If Git reports a conflict, resolve it, run `git add` on the resolved files, and commit before pushing.
 
 ## Deployment
 
@@ -66,7 +98,7 @@ Netlify uses a static Nuxt build and Netlify Image CDN. Vercel uses Nitro's Verc
 Never set `NUXT_IMAGE_PROVIDER=ipx` on Netlify static hosting or any static export. IPX needs a running Nuxt server. Use `netlify` for Netlify, `vercel` for Vercel, and reserve `ipx` for a self-hosted Nuxt server. When unset, WooNuxt uses Nuxt Image's portable `none` provider.
 ::
 
-WooNuxt deliberately has no `.nvmrc` or `package.json#engines` entry. Use the current Node.js version supported by your host rather than adding a pin unless your own customization has a documented compatibility requirement.
+Nuxt 4.6 requires Node.js `^22.22.3 || ^24.15.0 || >=26.0.0`. Make sure your local, CI, and hosting runtimes use a supported version. WooNuxt deliberately has no `.nvmrc` or `package.json#engines` entry; configure the Node.js version in your environment rather than adding a repository pin unless your own customization has a documented compatibility requirement.
 
 ## Large Catalog ISR Setup (10K+ Products)
 
@@ -135,36 +167,17 @@ To override base files, add a file with the same public name to your root app. F
 
 ### PWA configuration and extension
 
-WooNuxt includes `@vite-pwa/nuxt` in the base layer by default. You do not need extra setup to get a working baseline PWA.
-
-In other words, you get PWA support out of the box for free, and key defaults are automatically populated from your WordPress settings.
+WooNuxt includes `@vite-pwa/nuxt` in the base layer by default, with a service worker and a basic manifest.
 
 Default behavior:
 
 - PWA module is enabled in `woonuxt_base/nuxt.config.ts`.
-- Base defaults are assembled in `woonuxt_base/modules/woonuxt-bridge.ts`.
+- Manifest and service-worker defaults are configured in `woonuxt_base/nuxt.config.ts`.
 - `<NuxtPwaManifest />` is mounted in `woonuxt_base/app/app.vue`.
+- The service worker precaches `logo.svg` and `apple-touch-icon.png` from the generated public directory, including child-layer overrides.
+- Unmatched precache globs produce warnings rather than build errors because Nuxt payload files are not generated for every deployment preset. Set `workbox.globStrict` to `true` to enforce strict matching.
 
-How PWA values are resolved:
-
-1. **WordPress settings first**
-   - `generalSettings.title` → manifest `name` and app title
-   - `generalSettings.description` → manifest/head description
-   - `woonuxtSettings.primary_color` → manifest/head theme color
-2. **App config fallback**
-   - `siteName`
-   - `shortDescription` (or `description`)
-3. **Final fallback**
-   - Name falls back to `WooNuxt` if no title is available.
-
-You can set app-config fallback values in `woonuxt_base/app/app.config.ts` (or override from your child layer):
-
-```ts
-export default defineAppConfig({
-  siteName: 'My Store',
-  shortDescription: 'Headless WooCommerce storefront',
-});
-```
+The manifest uses generic WooNuxt branding and is no longer populated from WordPress or app config. Existing stores should set their own name, description, colors and icons in their child-layer config. Page title, description and theme-color metadata continue to use WordPress settings.
 
 To extend or override PWA behavior in your child layer, add a `pwa` block in your root `nuxt.config.ts`:
 
@@ -173,33 +186,18 @@ export default defineNuxtConfig({
   extends: ['./woonuxt_base'],
   pwa: {
     manifest: {
+      name: 'My Store',
       short_name: 'MyStore',
-      start_url: '/',
-      display: 'standalone',
-      // Optional custom icon set
-      icons: [
-        { src: '/pwa-192x192.png', sizes: '192x192', type: 'image/png' },
-        { src: '/pwa-512x512.png', sizes: '512x512', type: 'image/png' },
-      ],
-    },
-    workbox: {
-      // Example: add runtime caching for API/media routes
-      runtimeCaching: [
-        {
-          urlPattern: /^https:\/\/secure\.woonuxt\.com\/graphql/,
-          handler: 'NetworkFirst',
-          options: {
-            cacheName: 'graphql-cache',
-            networkTimeoutSeconds: 3,
-          },
-        },
-      ],
+      description: 'My online store',
+      theme_color: '#7f54b2',
     },
   },
 });
 ```
 
-Tip: PWA typically improves repeat-visit performance and resilience, not first-load speed.
+Replace `pwa-192x192.png` and `pwa-512x512.png` in your child layer's `public/` directory with your own icons. Nuxt merges layer configuration arrays, so adding `manifest.icons` can also retain the base icons.
+
+Review any custom caching rules carefully: cart, account, checkout and other personalized data should not be shared through a service-worker cache. PWA support does not make checkout available offline.
 
 ### Progress
 
@@ -286,11 +284,11 @@ The SDK is regenerated automatically before `dev`, `dev:ssl`, `build`, `generate
 | ---------------------------- | ------- |
 | WordPress                    | 7.0.1   |
 | WooCommerce                  | 10.9.4  |
-| WPGraphQL                    | 2.18.0  |
+| WPGraphQL                    | 2.26.0  |
 | WooGraphQL                   | 1.0.3   |
 | ~~WPGraphQL CORS~~           | ~~2.1~~ |
 | Headless Login for WPGraphQL | 0.4.4   |
-| Node                         | 22.22.2 |
+| Node                         | 22.22.3 |
 | PHP                          | 8.4     |
 
 ### Current translations

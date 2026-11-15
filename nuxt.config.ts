@@ -6,6 +6,16 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/plantivo.css'],
 
+  // WooNuxt supplies the PWA mechanics; the store owns its public identity.
+  pwa: {
+    manifest: {
+      name: 'Plantivo',
+      short_name: 'Plantivo',
+      description: 'Thoughtfully chosen plants for happier spaces.',
+      theme_color: '#0d5134',
+    },
+  },
+
   /**
    * Depending on your servers capabilities, you may need to adjust the following settings.
    * It will affect the build time but also increase the reliability of the build process.
